@@ -1,0 +1,31 @@
+{
+  "name": "appinsights-logger",
+  "version": "0.0.1",
+  "description": "thin, yet opinionated wrapper for applcation insights",
+  "repository": "gopuff/appinsights-logger",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "build": "del dist && tsc",
+    "prepublishOnly": "npm run build",
+    "test": "node test/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "types": "dist",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "applicationinsights": "^1.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^13.9.8",
+    "del-cli": "^3.0.0",
+    "dotenv": "^8.2.0",
+    "typescript": "^3.8.3"
+  }
+}
