@@ -1,9 +1,9 @@
 {
   "name": "appinsights-logger",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "thin, yet opinionated wrapper for applcation insights",
   "repository": "gopuff/appinsights-logger",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "engines": {
     "node": ">=8"
   },

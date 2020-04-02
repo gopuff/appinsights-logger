@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { trackDebugEvent, trackEvent, aiClient, trackTrace } = require('../dist/src/index')
+const { trackDebugEvent, trackEvent, aiClient, trackTrace } = require('../dist/index')
 
 for (let index = 0; index < 10; index++) {
     trackTrace({ message: 'LOGGERTEST', properties: { index } })

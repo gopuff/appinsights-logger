@@ -4,12 +4,11 @@
       "target": "es2017",
       "lib": ["es2017"],
       "outDir": "dist",
-      "rootDir": ".",
+      "rootDir": "src",
       "sourceMap": true,
       "strict": false,
       "moduleResolution": "node",
       "declaration": true,
       "pretty": true
-    },
-    "include": ["src"]
-  }
+    }
+}
