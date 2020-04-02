@@ -6,6 +6,9 @@
 npm i appinsights-logger --save
 ```
 
+### Environment setup
+Just set ENV variable `APPINSIGHTS_INSTRUMENTATIONKEY`
+
 ### Usage:
 ```js
 const { trackEvent, trackException } = require('appinsights-logger')
