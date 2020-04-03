@@ -19,13 +19,20 @@ export function trackDebugEvent (telemetry: EventTelemetry): void {
   }
 }
 
-export function markDependency (dependencyTypeName: String, name: String): any {
+interface IMarker {
+  dependencyTypeName: string;
+  name: string;
+  startTime: number;
+}
+
+export function markDependency (dependencyTypeName: string, name: string): IMarker {
   const startTime = Date.now()
   return { dependencyTypeName, name, startTime }
 }
 
-export function measureDependency ({ dependencyTypeName, name, startTime }): void {
+export function measureDependency (marker: IMarker, data = '', success = true): void {
+  const { startTime, dependencyTypeName, name } = marker
   const duration = Date.now() - startTime
-  const telemetry = { dependencyTypeName, name, duration, success: true } as DependencyTelemetry
+  const telemetry = { dependencyTypeName, name, duration, success, data } as DependencyTelemetry
   trackDependency(telemetry)
 }
