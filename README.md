@@ -25,7 +25,7 @@ trackException({ exception: ex, properties: { myProp: 'my value' } })
 ### HTTP request tracking:
 
 ```ts
-import { markDependency, measureDependency } from './appinsights-helper'
+import { markDependency, measureDependency } from 'appinsights-logger'
 
 const marker = markDependency('cosmos', 'query collection')
 try {
@@ -42,7 +42,7 @@ try {
 > dependency tracking is useful for measuring latency of remote calls (SQL, HTTP) and also failures
 
 ```ts
-import { markDependency, measureDependency } from './appinsights-helper'
+import { markDependency, measureDependency } from 'appinsights-logger'
 
 const marker = markDependency('cosmos', 'query collection')
 try {
@@ -60,7 +60,7 @@ try {
 > customEvents are powerful because you can query the logs by the `customDimensions` object
 
 ```ts
-import { trackDebugEvent } from from './appinsights-helper'
+import { trackDebugEvent } from from 'appinsights-logger'
 
 // This 'debug' event will only log if the DEBUG_INSIGHTS="true" env var is set
 trackDebugEvent({ name: 'new order',  properties: { order }, measurements: { productCount: order.products.length } }) 
