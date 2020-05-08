@@ -20,6 +20,54 @@ trackException({ exception: ex, properties: { myProp: 'my value' } })
 ```
 
 
+## Advanced usage
+
+### HTTP request tracking:
+
+```ts
+import { markDependency, measureDependency } from './appinsights-helper'
+
+const marker = markDependency('cosmos', 'query collection')
+try {
+  const url = 'https://domain.com/api/books'
+  const locations = await requestPromise(url)
+  measureDependency(marker, url)
+} catch(ex) {
+  measureDependency(marker, url, false)
+  // could also trackException(ex) here
+}
+```
+
+### Cosmos query tracking:
+> dependency tracking is useful for measuring latency of remote calls (SQL, HTTP) and also failures
+
+```ts
+import { markDependency, measureDependency } from './appinsights-helper'
+
+const marker = markDependency('cosmos', 'query collection')
+try {
+  const sql = 'select top 100 from c'
+  const locations = await cosmosDb.items.query(sql) // pseudo-code cosmos query
+  measureDependency(marker, sql)
+} catch(ex) {
+  measureDependency(marker, sql, false)
+  // could also trackException(ex) here
+}
+```
+
+
+### Debug Event tracking
+> customEvents are powerful because you can query the logs by the `customDimensions` object
+
+```ts
+import { trackDebugEvent } from from './appinsights-helper'
+
+// This 'debug' event will only log if the DEBUG_INSIGHTS="true" env var is set
+trackDebugEvent({ name: 'new order',  properties: { order }, measurements: { productCount: order.products.length } }) 
+```
+
+
+
 #### Run E2E Test
 
 ```sh
