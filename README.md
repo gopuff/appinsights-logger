@@ -27,9 +27,9 @@ trackException({ exception: ex, properties: { myProp: 'my value' } })
 ```ts
 import { markDependency, measureDependency } from 'appinsights-logger'
 
-const marker = markDependency('cosmos', 'query collection')
+const marker = markDependency('HTTP', 'GET /products')
 try {
-  const url = 'https://domain.com/api/books'
+  const url = 'https://domain.com/api/products'
   const locations = await requestPromise(url)
   measureDependency(marker, url)
 } catch(ex) {
