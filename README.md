@@ -76,6 +76,7 @@ cp .env.example .env
 > fill in `.env` with App Insight key
 
 ```sh
+npm run build
 npm test
 ```
 

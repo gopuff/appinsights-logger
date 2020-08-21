@@ -1,6 +1,7 @@
 import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry } from 'applicationinsights/out/Declarations/Contracts'
-appInsights.setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY).start()
+const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
+appInsights.setup(clientKey).start()
 export const aiClient = appInsights.defaultClient
 export const ai = appInsights // in case you need to override setup()
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
