@@ -19,7 +19,6 @@ const ex = new Error('some error')
 trackException({ exception: ex, properties: { myProp: 'my value' } })
 ```
 
-
 ## Advanced usage
 
 ### HTTP request tracking:
@@ -76,6 +75,7 @@ cp .env.example .env
 > fill in `.env` with App Insight key
 
 ```sh
+npm run build
 npm test
 ```
 
