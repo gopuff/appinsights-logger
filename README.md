@@ -19,11 +19,6 @@ const ex = new Error('some error')
 trackException({ exception: ex, properties: { myProp: 'my value' } })
 ```
 
-### Contributing
-1. Make a PR with whatever changes to the lib that you are adding
-2. Run `npm version patch -m 'describe what you added'` with your branch checked out to bump the version
-3. Upon your PR being merged the new version should be available
-
 ## Advanced usage
 
 ### HTTP request tracking:
