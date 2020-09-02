@@ -3,7 +3,7 @@ import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetr
 const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
 
 appInsights.setup(clientKey)
-    .setAutoDependencyCorrelation(true)
+    .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE ? process.env.AI_AUTO_DEPENDENCY_CORRELATE : true))
     .setAutoCollectRequests(true)
     .setAutoCollectPerformance(true, true)
     .setAutoCollectExceptions(true)
