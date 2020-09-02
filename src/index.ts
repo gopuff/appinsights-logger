@@ -1,7 +1,19 @@
 import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry } from 'applicationinsights/out/Declarations/Contracts'
 const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
-appInsights.setup(clientKey).start()
+
+appInsights.setup(clientKey)
+    .setAutoDependencyCorrelation(true)
+    .setAutoCollectRequests(true)
+    .setAutoCollectPerformance(true, true)
+    .setAutoCollectExceptions(true)
+    .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES ? process.env.AI_AUTOCOLLECT_DEPENDENCIES : true))
+    .setAutoCollectConsole(true)
+    .setUseDiskRetryCaching(true)
+    .setSendLiveMetrics(false)
+    .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
+    .start();
+
 export const aiClient = appInsights.defaultClient
 export const ai = appInsights // in case you need to override setup()
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
