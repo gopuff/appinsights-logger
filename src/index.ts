@@ -3,11 +3,11 @@ import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetr
 const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
 
 appInsights.setup(clientKey)
-    .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE ? process.env.AI_AUTO_DEPENDENCY_CORRELATE === 'true': true))
+    .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE === 'false' ? false : true))
     .setAutoCollectRequests(true)
     .setAutoCollectPerformance(true, true)
     .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES ? process.env.AI_AUTOCOLLECT_DEPENDENCIES === 'true': true))
+    .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES === 'false' ? false : true))
     .setAutoCollectConsole(true)
     .setUseDiskRetryCaching(true)
     .setSendLiveMetrics(false)
