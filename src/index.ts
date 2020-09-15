@@ -16,8 +16,7 @@ appInsights.setup(clientKey)
 
 export const ai = appInsights // in case you need to override setup()
 export const aiClient = appInsights.defaultClient
-aiClient.config.samplingPercentage = parseInt(process.env.SAMPLING_PERCENTAGE || '5')
-aiClient.addTelemetryProcessor(() => true)
+aiClient.config.samplingPercentage = parseInt(process.env.SAMPLING_PERCENTAGE || '100')
 ai.start()
 
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
