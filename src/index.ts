@@ -12,10 +12,14 @@ appInsights.setup(clientKey)
     .setUseDiskRetryCaching(true)
     .setSendLiveMetrics(false)
     .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
-    .start();
+    
 
-export const aiClient = appInsights.defaultClient
 export const ai = appInsights // in case you need to override setup()
+export const aiClient = appInsights.defaultClient
+aiClient.config.samplingPercentage = parseInt(process.env.SAMPLING_PERCENTAGE || '5')
+aiClient.addTelemetryProcessor(() => true)
+ai.start()
+
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
 aiClient.context.tags[aiClient.context.keys.cloudRole] = process.env.WEBSITE_SITE_NAME || 'defaultCloudRole'
 
