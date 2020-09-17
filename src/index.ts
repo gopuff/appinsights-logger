@@ -41,7 +41,6 @@ const samplingRulesByUrl = (envelope: Envelope, context: any, rulesDictionary: R
 
 export const addSamplingRulesByUrl = (rulesDictionary: RulesDictonary) => {
   aiClient.addTelemetryProcessor((envelope: Envelope, context: Context) => samplingRulesByUrl(envelope, context, rulesDictionary))
-  ai.start()
 }
 
 
