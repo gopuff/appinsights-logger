@@ -21,29 +21,6 @@ export const aiClient = appInsights.defaultClient
 aiClient.config.samplingPercentage = parseInt(process.env.AI_SAMPLING_PERCENTAGE || '100')
 ai.start()
 
-interface RulesDictonary {
-  // example: '/api/v3/calculation': 50
-  [key: string]: number
-}
-
-const samplingRulesByUrl = (envelope: Envelope, context: any, rulesDictionary: RulesDictonary = {}) => {
-  // if it's not an http request, use the regular sampling processor
-  if (!context['http.RequestOptions']) {
-    return samplingTelemetryProcessor(envelope, { correlationContext: context })
-  }
-  // otherwise, use the rules dictionary to determine how much to sample
-  const pathname = (context['http.RequestOptions'].uri || {}).pathname
-  const samplingRate = rulesDictionary[pathname] || aiClient.config.samplingPercentage
-
-  // if false returned from a telemetry processor, the data will not be sent
-  return samplingRate >= (Math.random() * 100)
-} 
-
-export const addSamplingRulesByUrl = (rulesDictionary: RulesDictonary) => {
-  aiClient.addTelemetryProcessor((envelope: Envelope, context: Context) => samplingRulesByUrl(envelope, context, rulesDictionary))
-}
-
-
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
 aiClient.context.tags[aiClient.context.keys.cloudRole] = process.env.WEBSITE_SITE_NAME || 'defaultCloudRole'
 
@@ -76,4 +53,26 @@ export function measureDependency (marker: IMarker, data = '', success = true): 
   const duration = Date.now() - startTime
   const telemetry = { dependencyTypeName, name, duration, success, data } as DependencyTelemetry
   trackDependency(telemetry)
+}
+
+interface RulesDictonary {
+  // example: '/api/v3/calculation': 50
+  [key: string]: number
+}
+
+const samplingRulesByUrl = (envelope: Envelope, context: any, rulesDictionary: RulesDictonary = {}) => {
+  // if it's not an http request, use the regular sampling processor
+  if (!context['http.RequestOptions']) {
+    return samplingTelemetryProcessor(envelope, { correlationContext: context })
+  }
+  // otherwise, use the rules dictionary to determine how much to sample
+  const pathname = (context['http.RequestOptions'].uri || {}).pathname
+  const samplingRate = rulesDictionary[pathname] || aiClient.config.samplingPercentage
+
+  // if false returned from a telemetry processor, the data will not be sent
+  return samplingRate >= (Math.random() * 100)
+} 
+
+export const addSamplingRulesByUrl = (rulesDictionary: RulesDictonary) => {
+  aiClient.addTelemetryProcessor((envelope: Envelope, context: Context) => samplingRulesByUrl(envelope, context, rulesDictionary))
 }
