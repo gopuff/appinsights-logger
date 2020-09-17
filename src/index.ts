@@ -1,5 +1,7 @@
 import * as appInsights from 'applicationinsights'
-import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry } from 'applicationinsights/out/Declarations/Contracts'
+import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry, Envelope } from 'applicationinsights/out/Declarations/Contracts'
+import { samplingTelemetryProcessor } from 'applicationinsights/out/TelemetryProcessors'
+import Context = require('applicationinsights/out/Library/Context')
 const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
 
 appInsights.setup(clientKey)
@@ -16,8 +18,32 @@ appInsights.setup(clientKey)
 
 export const ai = appInsights // in case you need to override setup()
 export const aiClient = appInsights.defaultClient
-aiClient.config.samplingPercentage = parseInt(process.env.SAMPLING_PERCENTAGE || '100')
+aiClient.config.samplingPercentage = parseInt(process.env.AI_SAMPLING_PERCENTAGE || '100')
 ai.start()
+
+interface RulesDictonary {
+  // example: '/api/v3/calculation': 50
+  [key: string]: number
+}
+
+const samplingRulesByUrl = (envelope: Envelope, context: any, rulesDictionary: RulesDictonary = {}) => {
+  // if it's not an http request, use the regular sampling processor
+  if (!context['http.RequestOptions']) {
+    return samplingTelemetryProcessor(envelope, { correlationContext: context })
+  }
+  // otherwise, use the rules dictionary to determine how much to sample
+  const pathname = (context['http.RequestOptions'].uri || {}).pathname
+  const samplingRate = rulesDictionary[pathname] || aiClient.config.samplingPercentage
+
+  // if false returned from a telemetry processor, the data will not be sent
+  return samplingRate >= (Math.random() * 100)
+} 
+
+export const addSamplingRulesByUrl = (rulesDictionary: RulesDictonary) => {
+  aiClient.addTelemetryProcessor((envelope: Envelope, context: Context) => samplingRulesByUrl(envelope, context, rulesDictionary))
+  ai.start()
+}
+
 
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
 aiClient.context.tags[aiClient.context.keys.cloudRole] = process.env.WEBSITE_SITE_NAME || 'defaultCloudRole'
