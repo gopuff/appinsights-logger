@@ -1,6 +1,7 @@
 import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry } from 'applicationinsights/out/Declarations/Contracts'
 const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
+import { addSamplingRulesByUrl, RulesDictonary } from './samplingRulesByUrl'
 
 appInsights.setup(clientKey)
     .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE === 'false' ? false : true))
@@ -12,10 +13,13 @@ appInsights.setup(clientKey)
     .setUseDiskRetryCaching(true)
     .setSendLiveMetrics(false)
     .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
-    .start();
+    
 
-export const aiClient = appInsights.defaultClient
 export const ai = appInsights // in case you need to override setup()
+export const aiClient = appInsights.defaultClient
+aiClient.config.samplingPercentage = parseInt(process.env.AI_SAMPLING_PERCENTAGE || '100')
+ai.start()
+
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
 aiClient.context.tags[aiClient.context.keys.cloudRole] = process.env.WEBSITE_SITE_NAME || 'defaultCloudRole'
 
@@ -48,4 +52,8 @@ export function measureDependency (marker: IMarker, data = '', success = true): 
   const duration = Date.now() - startTime
   const telemetry = { dependencyTypeName, name, duration, success, data } as DependencyTelemetry
   trackDependency(telemetry)
+}
+
+export function samplingRulesByUrl (rulesDictionary: RulesDictonary) {
+  addSamplingRulesByUrl(rulesDictionary, aiClient)
 }
