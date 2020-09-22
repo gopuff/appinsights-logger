@@ -1,6 +1,6 @@
 {
   "name": "appinsights-logger",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "thin, yet opinionated wrapper for applcation insights",
   "repository": "gopuff/appinsights-logger",
   "main": "dist/index.js",
