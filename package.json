@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^13.9.8",
-    "del-cli": "^3.0.0",
+    "del-cli": "^3.0.1",
     "dotenv": "^8.2.0",
     "typescript": "^3.8.3"
   }
