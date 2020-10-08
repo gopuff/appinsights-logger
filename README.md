@@ -9,7 +9,7 @@ npm i appinsights-logger --save
 ### Environment setup
 Just set ENV variable `APPINSIGHTS_INSTRUMENTATIONKEY`
 
-Set the AI_MESSAGE_NAMESPACE ENV variable to identify message source. Format is [goPuff].[AgileTeam].[Repo] (gopuff.Architecture.Appinsights)
+Set the AI_MESSAGE_NAMESPACE ENV variable to identify message source. Format is [myCompany].[AgileTeam].[Repo] (foocompany.Architecture.Appinsights)
 
 ### Usage:
 ```js

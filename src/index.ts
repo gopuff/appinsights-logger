@@ -2,7 +2,7 @@ import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry, Telemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { addSamplingRulesByUrl, RulesDictonary } from './samplingRulesByUrl'
 const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
-const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || "gopuff.Missingnamespace")
+const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || "missingnamespace")
 
 appInsights.setup(clientKey)
     .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE === 'false' ? false : true))
