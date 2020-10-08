@@ -1,7 +1,8 @@
 import * as appInsights from 'applicationinsights'
-import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry } from 'applicationinsights/out/Declarations/Contracts'
-const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
+import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry, Telemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { addSamplingRulesByUrl, RulesDictonary } from './samplingRulesByUrl'
+const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
+const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || "missingnamespace")
 
 appInsights.setup(clientKey)
     .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE === 'false' ? false : true))
@@ -23,16 +24,20 @@ ai.start()
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
 aiClient.context.tags[aiClient.context.keys.cloudRole] = process.env.WEBSITE_SITE_NAME || 'defaultCloudRole'
 
-export function trackEvent (telemetry: EventTelemetry): void { aiClient.trackEvent(telemetry) }
-export function trackException (telemetry: ExceptionTelemetry): void { aiClient.trackException(telemetry) }
-export function trackDependency (telemetry: DependencyTelemetry): void { aiClient.trackDependency(telemetry) }
-export function trackTrace (telemetry: TraceTelemetry): void { aiClient.trackTrace(telemetry) }
-export function trackRequest (telemetry: RequestTelemetry): void { aiClient.trackRequest(telemetry) }
-export function trackMetric (telemetry: MetricTelemetry): void { aiClient.trackMetric(telemetry) }
+export function trackEvent (telemetry: EventTelemetry): void { aiClient.trackEvent(addMetadataProps(telemetry)) }
+export function trackException (telemetry: ExceptionTelemetry): void { 
+  aiClient.trackException(addMetadataProps(telemetry)) 
+}
+export function trackDependency (telemetry: DependencyTelemetry): void { 
+  aiClient.trackDependency(addMetadataProps(telemetry)) 
+}
+export function trackTrace (telemetry: TraceTelemetry): void { aiClient.trackTrace(addMetadataProps(telemetry)) }
+export function trackRequest (telemetry: RequestTelemetry): void { aiClient.trackRequest(addMetadataProps(telemetry)) }
+export function trackMetric (telemetry: MetricTelemetry): void { aiClient.trackMetric(addMetadataProps(telemetry)) }
 
 export function trackDebugEvent (telemetry: EventTelemetry): void {
   if (debugInsightsEnabled) {
-    trackEvent(telemetry)
+    trackEvent(addMetadataProps(telemetry))
   }
 }
 
@@ -56,4 +61,9 @@ export function measureDependency (marker: IMarker, data = '', success = true): 
 
 export function samplingRulesByUrl (rulesDictionary: RulesDictonary) {
   addSamplingRulesByUrl(rulesDictionary, aiClient)
+}
+
+export function addMetadataProps <T extends Telemetry>(telemetry: T) {
+  telemetry.properties = { ...telemetry.properties, namespace: messageNamespace}
+  return telemetry
 }
