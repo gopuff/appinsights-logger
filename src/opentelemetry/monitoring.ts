@@ -1,3 +1,4 @@
+/**
 const { MeterProvider } = require('@opentelemetry/metrics')
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus')
 const api = require('@opentelemetry/api')
@@ -26,12 +27,8 @@ const meterProvider = new MeterProvider({
   interval: 1000
 })
 
-const meter = meterProvider.getMeter('go-drive')
+const meter = meterProvider.getMeter('appinsights-logger')
 
-/**
- * Registering the provider with the API allows it to be discovered
- * and used by instrumentation libraries.
- */
 api.metrics.setGlobalMeterProvider(meterProvider)
 
 module.exports = {
@@ -39,3 +36,5 @@ module.exports = {
   meter,
   exporter
 }
+
+*/

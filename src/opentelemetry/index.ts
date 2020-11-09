@@ -3,7 +3,7 @@ const { APPINSIGHTS_INSTRUMENTATIONKEY } = process.env.APPINSIGHTS_INSTRUMENTATI
 const { LogLevel } = require('@opentelemetry/core')
 const { NodeTracerProvider } = require('@opentelemetry/node')
 const { BatchSpanProcessor } = require('@opentelemetry/tracing')
-const { meter, exporter } = require('./monitoring')
+// const { meter, exporter } = require('./monitoring')
 
 // Use your existing provider
 const provider = new NodeTracerProvider({
@@ -46,8 +46,10 @@ const { HttpTraceContext } = require('@opentelemetry/core')
 /* Set Global Propagator */
 api.propagation.setGlobalPropagator(new HttpTraceContext())
 
+/** 
 module.exports = {
-  tracer: provider.getTracer('go-drive'),
+  tracer: provider.getTracer('appinsights-logger'),
   meter,
   exporter
 }
+*/
