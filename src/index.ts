@@ -1,3 +1,4 @@
+const { tracer } = require('opentelemetry')
 import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry, Telemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { addSamplingRulesByUrl, RulesDictonary } from './samplingRulesByUrl'
