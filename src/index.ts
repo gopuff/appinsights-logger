@@ -12,7 +12,7 @@ appInsights.setup(clientKey)
     .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES === 'false' ? false : true))
     .setAutoCollectConsole(true)
     .setUseDiskRetryCaching(true)
-    .setSendLiveMetrics(false)
+    .setSendLiveMetrics(true)
     .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
 
 
