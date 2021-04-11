@@ -67,3 +67,23 @@ export function addMetadataProps <T extends Telemetry>(telemetry: T) {
   telemetry.properties = { ...telemetry.properties, namespace: messageNamespace}
   return telemetry
 }
+
+export function httpTriggerWrapper (fn, customDimensions = {}) {
+  return async function contextPropagatingHttpTrigger(context, req) {
+      const correlationContext = ai.startOperation(context, req)
+
+      return ai.wrapWithCorrelationContext(async () => {
+          const startTime = Date.now()
+          await fn(context, req)
+          ai.defaultClient.trackRequest({
+              name: context.req.method + " " + context.req.url,
+              resultCode: context.res.status,
+              success: true,
+              url: req.url,
+              duration: Date.now() - startTime,
+              id: correlationContext.operation.parentId,
+              properties: customDimensions
+          })
+  }, correlationContext)()
+  }
+}
