@@ -1,6 +1,6 @@
 {
   "name": "appinsights-logger",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "thin, yet opinionated wrapper for applcation insights",
   "repository": "gopuff/appinsights-logger",
   "main": "dist/index.js",
@@ -20,7 +20,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "applicationinsights": "^1.7.3"
+    "applicationinsights": "^1.8.10"
   },
   "devDependencies": {
     "@types/node": "^13.9.8",
