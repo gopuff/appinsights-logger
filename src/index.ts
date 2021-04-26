@@ -104,14 +104,33 @@ export async function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  cus
         const correlationContext = ai.startOperation(context, context.executionContext.functionName)
         return ai.wrapWithCorrelationContext(async () => {
             const startTime = Date.now()
-            await fn(context)
-            ai.defaultClient.trackEvent({
-                name: eventName,
-                properties: {
+            try {
+                await fn(context)
+                ai.defaultClient.trackRequest({
+                    name: context.executionContext.functionName,
+                    resultCode: 'complete',
+                    success: true,
+                    url: eventName,
                     duration: Date.now() - startTime,
-                    ...customDimensions,
-                },
-            })
+                    id: correlationContext.operation.parentId,
+                    properties: customDimensions
+                })
+            } catch (err) {
+                ai.defaultClient.trackRequest({
+                    name: context.executionContext.functionName,
+                    resultCode: 'failure',
+                    success: false,
+                    url: eventName,
+                    duration: Date.now() - startTime,
+                    id: correlationContext.operation.parentId,
+                    properties: {
+                        error: err,
+                        ...customDimensions,
+                    }
+                })
+                throw err
+            }
+
         }, correlationContext)
     }
 }
