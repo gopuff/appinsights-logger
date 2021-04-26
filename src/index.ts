@@ -14,7 +14,7 @@ appInsights.setup(clientKey)
     .setUseDiskRetryCaching(true)
     .setSendLiveMetrics(false)
     .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
-    
+
 
 export const ai = appInsights // in case you need to override setup()
 export const aiClient = appInsights.defaultClient
@@ -25,11 +25,11 @@ const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
 aiClient.context.tags[aiClient.context.keys.cloudRole] = process.env.WEBSITE_SITE_NAME || 'defaultCloudRole'
 
 export function trackEvent (telemetry: EventTelemetry): void { aiClient.trackEvent(addMetadataProps(telemetry)) }
-export function trackException (telemetry: ExceptionTelemetry): void { 
-  aiClient.trackException(addMetadataProps(telemetry)) 
+export function trackException (telemetry: ExceptionTelemetry): void {
+  aiClient.trackException(addMetadataProps(telemetry))
 }
-export function trackDependency (telemetry: DependencyTelemetry): void { 
-  aiClient.trackDependency(addMetadataProps(telemetry)) 
+export function trackDependency (telemetry: DependencyTelemetry): void {
+  aiClient.trackDependency(addMetadataProps(telemetry))
 }
 export function trackTrace (telemetry: TraceTelemetry): void { aiClient.trackTrace(addMetadataProps(telemetry)) }
 export function trackRequest (telemetry: RequestTelemetry): void { aiClient.trackRequest(addMetadataProps(telemetry)) }
@@ -86,4 +86,32 @@ export function httpTriggerWrapper (fn, customDimensions = {}) {
           })
   }, correlationContext)()
   }
+}
+
+/**
+ * Wrap your handler with this function in order to get correlation logs
+ *   for your function
+ * Note: for adding correlation support to Http triggers @see httpTriggerWrapper
+ *
+ * @param fn Function to run
+ * @param eventName name of the event that will be tracked in AI
+ * @param customDimensions any custom metric dimension
+ *
+ * @see https://github.com/microsoft/ApplicationInsights-node.js/#setting-up-auto-correlation-for-azure-functions
+ */
+export async function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  customDimensions = {}) {
+    return async function contextPropagationTrigger(context) {
+        const correlationContext = ai.startOperation(context, context.executionContext.functionName)
+        return ai.wrapWithCorrelationContext(async () => {
+            const startTime = Date.now()
+            await fn(context)
+            ai.defaultClient.trackEvent({
+                name: eventName,
+                properties: {
+                    duration: Date.now() - startTime,
+                    ...customDimensions,
+                },
+            })
+        }, correlationContext)
+    }
 }
