@@ -99,7 +99,7 @@ export function httpTriggerWrapper (fn, customDimensions = {}) {
  *
  * @see https://github.com/microsoft/ApplicationInsights-node.js/#setting-up-auto-correlation-for-azure-functions
  */
-export async function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  customDimensions = {}) {
+export function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  customDimensions = {}) {
     return async function contextPropagationTrigger(context) {
         const correlationContext = ai.startOperation(context, context.executionContext.functionName)
         return ai.wrapWithCorrelationContext(async () => {
