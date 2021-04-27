@@ -130,7 +130,6 @@ export async function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  cus
                 })
                 throw err
             }
-
-        }, correlationContext)
+        }, correlationContext)()
     }
 }
