@@ -130,7 +130,6 @@ export function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  customDim
                 })
                 throw err
             }
-
-        }, correlationContext)
+        }, correlationContext)()
     }
 }
