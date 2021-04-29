@@ -70,21 +70,20 @@ export function addMetadataProps <T extends Telemetry>(telemetry: T) {
 
 export function httpTriggerWrapper (fn, customDimensions = {}) {
   return async function contextPropagatingHttpTrigger(context, req) {
-      const correlationContext = ai.startOperation(context, req)
-
-      return ai.wrapWithCorrelationContext(async () => {
-          const startTime = Date.now()
-          await fn(context, req)
-          ai.defaultClient.trackRequest({
-              name: context.req.method + " " + context.req.url,
-              resultCode: context.res.status,
-              success: true,
-              url: req.url,
-              duration: Date.now() - startTime,
-              id: correlationContext.operation.parentId,
-              properties: customDimensions
-          })
-  }, correlationContext)()
+    const correlationContext = ai.startOperation(context, req)
+    return ai.wrapWithCorrelationContext(async () => {
+      const startTime = Date.now()
+      await fn(context, req)
+      ai.defaultClient.trackRequest({
+        name: context.req.method + " " + context.req.url,
+        resultCode: context.res.status,
+        success: context.res.status >= 500,
+        url: req.url,
+        duration: Date.now() - startTime,
+        id: correlationContext.operation.parentId,
+        properties: customDimensions
+      })
+    }, correlationContext)()
   }
 }
 
@@ -100,36 +99,36 @@ export function httpTriggerWrapper (fn, customDimensions = {}) {
  * @see https://github.com/microsoft/ApplicationInsights-node.js/#setting-up-auto-correlation-for-azure-functions
  */
 export function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  customDimensions = {}) {
-    return async function contextPropagationTrigger(context) {
-        const correlationContext = ai.startOperation(context, context.executionContext.functionName)
-        return ai.wrapWithCorrelationContext(async () => {
-            const startTime = Date.now()
-            try {
-                await fn(context)
-                ai.defaultClient.trackRequest({
-                    name: context.executionContext.functionName,
-                    resultCode: 'complete',
-                    success: true,
-                    url: eventName,
-                    duration: Date.now() - startTime,
-                    id: correlationContext.operation.parentId,
-                    properties: customDimensions
-                })
-            } catch (err) {
-                ai.defaultClient.trackRequest({
-                    name: context.executionContext.functionName,
-                    resultCode: 'failure',
-                    success: false,
-                    url: eventName,
-                    duration: Date.now() - startTime,
-                    id: correlationContext.operation.parentId,
-                    properties: {
-                        error: err,
-                        ...customDimensions,
-                    }
-                })
-                throw err
-            }
-        }, correlationContext)()
-    }
+  return async function contextPropagationTrigger(context) {
+    const correlationContext = ai.startOperation(context, context.executionContext.functionName)
+    return ai.wrapWithCorrelationContext(async () => {
+      const startTime = Date.now()
+      try {
+        await fn(context)
+        ai.defaultClient.trackRequest({
+          name: context.executionContext.functionName,
+          resultCode: 'complete',
+          success: true,
+          url: eventName,
+          duration: Date.now() - startTime,
+          id: correlationContext.operation.parentId,
+          properties: customDimensions
+        })
+      } catch (err) {
+        ai.defaultClient.trackRequest({
+          name: context.executionContext.functionName,
+          resultCode: 'failure',
+          success: false,
+          url: eventName,
+          duration: Date.now() - startTime,
+          id: correlationContext.operation.parentId,
+          properties: {
+            error: err,
+            ...customDimensions,
+          }
+        })
+        throw err
+      }
+    }, correlationContext)()
+  }
 }
