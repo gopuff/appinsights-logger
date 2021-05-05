@@ -77,7 +77,7 @@ export function httpTriggerWrapper (fn, customDimensions = {}) {
       ai.defaultClient.trackRequest({
         name: context.req.method + " " + context.req.url,
         resultCode: context.res.status,
-        success: context.res.status >= 500,
+        success: context.res.status < 500,
         url: req.url,
         duration: Date.now() - startTime,
         id: correlationContext.operation.parentId,
