@@ -12,7 +12,7 @@ appInsights.setup(clientKey)
   .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES !== 'false'))
   .setAutoCollectConsole(true)
   .setUseDiskRetryCaching(true)
-  .setSendLiveMetrics(false)
+  .setSendLiveMetrics(true)
   .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
 
 export const ai = appInsights // in case you need to override setup()
