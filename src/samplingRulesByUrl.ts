@@ -1,6 +1,6 @@
 import { samplingTelemetryProcessor } from 'applicationinsights/out/TelemetryProcessors'
-import Context = require('applicationinsights/out/Library/Context')
 import { Envelope } from 'applicationinsights/out/Declarations/Contracts'
+import Context = require('applicationinsights/out/Library/Context')
 
 export interface RulesDictonary {
   // example: '/api/v3/calculation': 50
@@ -18,7 +18,7 @@ const samplingRulesByUrl = (aiClient: any, envelope: Envelope, context: any, rul
 
   // if false returned from a telemetry processor, the data will not be sent
   return samplingRate >= (Math.random() * 100)
-} 
+}
 
 export const addSamplingRulesByUrl = (rulesDictionary: RulesDictonary, aiClient: any) => {
   aiClient.addTelemetryProcessor((envelope: Envelope, context: Context) => samplingRulesByUrl(aiClient, envelope, context, rulesDictionary))

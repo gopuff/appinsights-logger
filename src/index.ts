@@ -1,20 +1,19 @@
 import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry, Telemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { addSamplingRulesByUrl, RulesDictonary } from './samplingRulesByUrl'
-const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
-const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || "missingnamespace")
+const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || 'fake')
+const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || 'missingnamespace')
 
 appInsights.setup(clientKey)
-  .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE === 'false' ? false : true))
+  .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE !== 'false'))
   .setAutoCollectRequests(true)
   .setAutoCollectPerformance(true, true)
   .setAutoCollectExceptions(true)
-  .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES === 'false' ? false : true))
+  .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES !== 'false'))
   .setAutoCollectConsole(true)
   .setUseDiskRetryCaching(true)
   .setSendLiveMetrics(true)
   .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
-
 
 export const ai = appInsights // in case you need to override setup()
 export const aiClient = appInsights.defaultClient
@@ -24,18 +23,18 @@ ai.start()
 const debugInsightsEnabled = (process.env.DEBUG_INSIGHTS === 'true') || false
 aiClient.context.tags[aiClient.context.keys.cloudRole] = process.env.WEBSITE_SITE_NAME || 'defaultCloudRole'
 
-export function trackEvent(telemetry: EventTelemetry): void { aiClient.trackEvent(addMetadataProps(telemetry)) }
-export function trackException(telemetry: ExceptionTelemetry): void {
+export function trackEvent (telemetry: EventTelemetry): void { aiClient.trackEvent(addMetadataProps(telemetry)) }
+export function trackException (telemetry: ExceptionTelemetry): void {
   aiClient.trackException(addMetadataProps(telemetry))
 }
-export function trackDependency(telemetry: DependencyTelemetry): void {
+export function trackDependency (telemetry: DependencyTelemetry): void {
   aiClient.trackDependency(addMetadataProps(telemetry))
 }
-export function trackTrace(telemetry: TraceTelemetry): void { aiClient.trackTrace(addMetadataProps(telemetry)) }
-export function trackRequest(telemetry: RequestTelemetry): void { aiClient.trackRequest(addMetadataProps(telemetry)) }
-export function trackMetric(telemetry: MetricTelemetry): void { aiClient.trackMetric(addMetadataProps(telemetry)) }
+export function trackTrace (telemetry: TraceTelemetry): void { aiClient.trackTrace(addMetadataProps(telemetry)) }
+export function trackRequest (telemetry: RequestTelemetry): void { aiClient.trackRequest(addMetadataProps(telemetry)) }
+export function trackMetric (telemetry: MetricTelemetry): void { aiClient.trackMetric(addMetadataProps(telemetry)) }
 
-export function trackDebugEvent(telemetry: EventTelemetry): void {
+export function trackDebugEvent (telemetry: EventTelemetry): void {
   if (debugInsightsEnabled) {
     trackEvent(addMetadataProps(telemetry))
   }
@@ -47,36 +46,36 @@ interface IMarker {
   startTime: number;
 }
 
-export function markDependency(dependencyTypeName: string, name: string): IMarker {
+export function markDependency (dependencyTypeName: string, name: string): IMarker {
   const startTime = Date.now()
   return { dependencyTypeName, name, startTime }
 }
 
-export function measureDependency(marker: IMarker, data = '', success = true): void {
+export function measureDependency (marker: IMarker, data = '', success = true): void {
   const { startTime, dependencyTypeName, name } = marker
   const duration = Date.now() - startTime
   const telemetry = { dependencyTypeName, name, duration, success, data } as DependencyTelemetry
   trackDependency(telemetry)
 }
 
-export function samplingRulesByUrl(rulesDictionary: RulesDictonary) {
+export function samplingRulesByUrl (rulesDictionary: RulesDictonary) {
   addSamplingRulesByUrl(rulesDictionary, aiClient)
 }
 
-export function addMetadataProps<T extends Telemetry>(telemetry: T) {
+export function addMetadataProps<T extends Telemetry> (telemetry: T) {
   telemetry.properties = { ...telemetry.properties, namespace: messageNamespace }
   return telemetry
 }
 
-export function httpTriggerWrapper(fn, customDimensions = {}) {
-  return async function contextPropagatingHttpTrigger(context, req) {
+export function httpTriggerWrapper (fn, customDimensions = {}) {
+  return async function contextPropagatingHttpTrigger (context, req) {
     const correlationContext = ai.startOperation(context, req)
 
     return ai.wrapWithCorrelationContext(async () => {
       const startTime = Date.now()
       await fn(context, req)
       ai.defaultClient.trackRequest({
-        name: context.req.method + " " + context.req.url,
+        name: context.req.method + ' ' + context.req.url,
         resultCode: context.res.status,
         success: true,
         url: req.url,
@@ -99,8 +98,8 @@ export function httpTriggerWrapper(fn, customDimensions = {}) {
  *
  * @see https://github.com/microsoft/ApplicationInsights-node.js/#setting-up-auto-correlation-for-azure-functions
  */
-export function functionWrapper(fn, eventName = "FUNCTION_EXECUTION", customDimensions = {}) {
-  return async function contextPropagationTrigger(context) {
+export function functionWrapper (fn, eventName = 'FUNCTION_EXECUTION', customDimensions = {}) {
+  return async function contextPropagationTrigger (context) {
     const correlationContext = ai.startOperation(context, context.executionContext.functionName)
     return ai.wrapWithCorrelationContext(async () => {
       const startTime = Date.now()
@@ -125,7 +124,7 @@ export function functionWrapper(fn, eventName = "FUNCTION_EXECUTION", customDime
           id: correlationContext.operation.parentId,
           properties: {
             error: err,
-            ...customDimensions,
+            ...customDimensions
           }
         })
         throw err
