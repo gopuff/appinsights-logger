@@ -1,20 +1,19 @@
 import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry, Telemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { addSamplingRulesByUrl, RulesDictonary } from './samplingRulesByUrl'
-const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "fake")
-const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || "missingnamespace")
+const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || 'fake')
+const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || 'missingnamespace')
 
 appInsights.setup(clientKey)
-    .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE === 'false' ? false : true))
-    .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true, true)
-    .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES === 'false' ? false : true))
-    .setAutoCollectConsole(true)
-    .setUseDiskRetryCaching(true)
-    .setSendLiveMetrics(false)
-    .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
-
+  .setAutoDependencyCorrelation(<boolean>(process.env.AI_AUTO_DEPENDENCY_CORRELATE !== 'false'))
+  .setAutoCollectRequests(true)
+  .setAutoCollectPerformance(true, true)
+  .setAutoCollectExceptions(true)
+  .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES !== 'false'))
+  .setAutoCollectConsole(true)
+  .setUseDiskRetryCaching(true)
+  .setSendLiveMetrics(false)
+  .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
 
 export const ai = appInsights // in case you need to override setup()
 export const aiClient = appInsights.defaultClient
@@ -63,28 +62,28 @@ export function samplingRulesByUrl (rulesDictionary: RulesDictonary) {
   addSamplingRulesByUrl(rulesDictionary, aiClient)
 }
 
-export function addMetadataProps <T extends Telemetry>(telemetry: T) {
-  telemetry.properties = { ...telemetry.properties, namespace: messageNamespace}
+export function addMetadataProps<T extends Telemetry> (telemetry: T) {
+  telemetry.properties = { ...telemetry.properties, namespace: messageNamespace }
   return telemetry
 }
 
 export function httpTriggerWrapper (fn, customDimensions = {}) {
-  return async function contextPropagatingHttpTrigger(context, req) {
-      const correlationContext = ai.startOperation(context, req)
+  return async function contextPropagatingHttpTrigger (context, req) {
+    const correlationContext = ai.startOperation(context, req)
 
-      return ai.wrapWithCorrelationContext(async () => {
-          const startTime = Date.now()
-          await fn(context, req)
-          ai.defaultClient.trackRequest({
-              name: context.req.method + " " + context.req.url,
-              resultCode: context.res.status,
-              success: true,
-              url: req.url,
-              duration: Date.now() - startTime,
-              id: correlationContext.operation.parentId,
-              properties: customDimensions
-          })
-  }, correlationContext)()
+    return ai.wrapWithCorrelationContext(async () => {
+      const startTime = Date.now()
+      await fn(context, req)
+      ai.defaultClient.trackRequest({
+        name: context.req.method + ' ' + context.req.url,
+        resultCode: context.res.status,
+        success: true,
+        url: req.url,
+        duration: Date.now() - startTime,
+        id: correlationContext.operation.parentId,
+        properties: customDimensions
+      })
+    }, correlationContext)()
   }
 }
 
@@ -99,37 +98,37 @@ export function httpTriggerWrapper (fn, customDimensions = {}) {
  *
  * @see https://github.com/microsoft/ApplicationInsights-node.js/#setting-up-auto-correlation-for-azure-functions
  */
-export function functionWrapper(fn, eventName = "FUNCTION_EXECUTION",  customDimensions = {}) {
-    return async function contextPropagationTrigger(context) {
-        const correlationContext = ai.startOperation(context, context.executionContext.functionName)
-        return ai.wrapWithCorrelationContext(async () => {
-            const startTime = Date.now()
-            try {
-                await fn(context)
-                ai.defaultClient.trackRequest({
-                    name: context.executionContext.functionName,
-                    resultCode: 'complete',
-                    success: true,
-                    url: eventName,
-                    duration: Date.now() - startTime,
-                    id: correlationContext.operation.parentId,
-                    properties: customDimensions
-                })
-            } catch (err) {
-                ai.defaultClient.trackRequest({
-                    name: context.executionContext.functionName,
-                    resultCode: 'failure',
-                    success: false,
-                    url: eventName,
-                    duration: Date.now() - startTime,
-                    id: correlationContext.operation.parentId,
-                    properties: {
-                        error: err,
-                        ...customDimensions,
-                    }
-                })
-                throw err
-            }
-        }, correlationContext)()
-    }
+export function functionWrapper (fn, eventName = 'FUNCTION_EXECUTION', customDimensions = {}) {
+  return async function contextPropagationTrigger (context) {
+    const correlationContext = ai.startOperation(context, context.executionContext.functionName)
+    return ai.wrapWithCorrelationContext(async () => {
+      const startTime = Date.now()
+      try {
+        await fn(context)
+        ai.defaultClient.trackRequest({
+          name: context.executionContext.functionName,
+          resultCode: 'complete',
+          success: true,
+          url: eventName,
+          duration: Date.now() - startTime,
+          id: correlationContext.operation.parentId,
+          properties: customDimensions
+        })
+      } catch (err) {
+        ai.defaultClient.trackRequest({
+          name: context.executionContext.functionName,
+          resultCode: 'failure',
+          success: false,
+          url: eventName,
+          duration: Date.now() - startTime,
+          id: correlationContext.operation.parentId,
+          properties: {
+            error: err,
+            ...customDimensions
+          }
+        })
+        throw err
+      }
+    }, correlationContext)()
+  }
 }
