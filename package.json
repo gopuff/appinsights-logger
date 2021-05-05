@@ -10,6 +10,7 @@
   "scripts": {
     "build": "del dist && tsc",
     "prepublishOnly": "npm run build",
+    "lint": "standardx .",
     "test": "node test/index.js"
   },
   "files": [
@@ -24,8 +25,11 @@
   },
   "devDependencies": {
     "@types/node": "^13.9.8",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
     "del-cli": "^3.0.1",
     "dotenv": "^8.2.0",
+    "standardx": "^7.0.0",
     "typescript": "^3.8.3"
   }
 }
