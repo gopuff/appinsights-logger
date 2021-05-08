@@ -74,10 +74,11 @@ export function httpTriggerWrapper (fn, customDimensions = {}) {
     return ai.wrapWithCorrelationContext(async () => {
       const startTime = Date.now()
       await fn(context, req)
+      const res = context.res || { status: 599 }
       ai.defaultClient.trackRequest({
         name: context.req.method + ' ' + context.req.url,
-        resultCode: context.res.status,
-        success: context.res.status < 400,
+        resultCode: res.status,
+        success: res.status < 400,
         url: req.url,
         duration: Date.now() - startTime,
         id: correlationContext.operation.parentId,
