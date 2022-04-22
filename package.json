@@ -21,7 +21,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "applicationinsights": "^2.2.2"
+    "applicationinsights": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^13.9.8",
