@@ -12,7 +12,7 @@ appInsights.setup(clientKey)
   .setAutoCollectDependencies(<boolean>(process.env.AI_AUTOCOLLECT_DEPENDENCIES !== 'false'))
   .setAutoCollectConsole(true)
   .setUseDiskRetryCaching(true)
-  .setSendLiveMetrics(true)
+  .setSendLiveMetrics(process.env.AI_ENABLE_LIVEMETRICS === 'true') // Default to disabled: https://github.com/microsoft/ApplicationInsights-node.js/issues/615
   .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
 
 export const ai = appInsights // in case you need to override setup()
