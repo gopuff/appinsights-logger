@@ -1,6 +1,7 @@
 import * as appInsights from 'applicationinsights'
 import { EventTelemetry, DependencyTelemetry, ExceptionTelemetry, MetricTelemetry, RequestTelemetry, TraceTelemetry, Telemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { addSamplingRulesByUrl, RulesDictonary } from './samplingRulesByUrl'
+import { Agent } from 'https'
 const clientKey = (process.env.APPINSIGHTS_INSTRUMENTATIONKEY || 'fake')
 const messageNamespace = (process.env.AI_MESSAGE_NAMESPACE || 'missingnamespace')
 
@@ -14,6 +15,7 @@ appInsights.setup(clientKey)
   .setUseDiskRetryCaching(true)
   .setSendLiveMetrics(process.env.AI_ENABLE_LIVEMETRICS === 'true') // Default to disabled: https://github.com/microsoft/ApplicationInsights-node.js/issues/615
   .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
+appInsights.defaultClient.config.httpsAgent = new Agent({ keepAlive: true, maxSockets: 400 })
 
 export const ai = appInsights // in case you need to override setup()
 export const aiClient = appInsights.defaultClient
