@@ -15,7 +15,9 @@ appInsights.setup(clientKey)
   .setUseDiskRetryCaching(true)
   .setSendLiveMetrics(process.env.AI_ENABLE_LIVEMETRICS === 'true') // Default to disabled: https://github.com/microsoft/ApplicationInsights-node.js/issues/615
   .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
-appInsights.defaultClient.config.httpsAgent = new Agent({ keepAlive: true, maxSockets: 400 })
+const maxSockets = (process.env.AI_MAX_SOCKETS || 20) as number
+const maxFreeSockets = (process.env.AI_MAX_FREE_SOCKETS || 10) as number
+appInsights.defaultClient.config.httpsAgent = new Agent({ keepAlive: true, maxSockets, maxFreeSockets })
 
 export const ai = appInsights // in case you need to override setup()
 export const aiClient = appInsights.defaultClient
