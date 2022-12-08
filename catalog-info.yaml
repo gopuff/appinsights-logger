@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: appinsights-logger
+  annotations:
+    github.com/project-slug: gopuff/appinsights-logger
+spec:
+  type: other
+  lifecycle: unknown
+  owner: sre
